@@ -93,9 +93,9 @@ namespace FileMIApp
                 {
                     if (strAccessToken != null && strAuthenticationURL != null)
                     {
-                        if (DBB.FolderExists("/FileMItest") == false)
+                        if (DBB.FolderExists("/FileMItest123") == false)
                         {
-                            DBB.CreateFolder("/FileMItest");
+                            DBB.CreateFolder("/FileMItest123");
                         }
                     }
                 }
@@ -114,7 +114,7 @@ namespace FileMIApp
                 {
                     if (strAccessToken != null && strAuthenticationURL != null)
                     {
-                        DBB.Upload("/Dropbox/DotNetApi", "Sample-test.jpg", @"D:\Capture4-test.PNG");
+                        DBB.Upload("/FileMItest", "12345.jpg", @"D:\12345.JPG");
                     }
                 }
             }
@@ -174,7 +174,7 @@ namespace FileMIApp
                 {
                     if (strAccessToken != null && strAuthenticationURL != null)
                     {
-                        DBB.ListFolder("Dropbox/FileMI");
+                        DBB.ListFolder("/FileMI");
                     }
                 }
             }
