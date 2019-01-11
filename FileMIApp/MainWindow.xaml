@@ -30,12 +30,12 @@
             </Grid>
 
         </GroupBox>
-        <GroupBox x:Name="gbDropBox" HorizontalAlignment="Left" Margin="-1,104.8,0,-168.8" Grid.Row="3" VerticalAlignment="Stretch" Background="White" IsEnabled="false" Width="1014">
+        <GroupBox x:Name="gbDropBox" HorizontalAlignment="Left" Margin="-1,0.8,0,-175" Grid.Row="2" Background="White" IsEnabled="false" Width="1014" Grid.RowSpan="2">
             <GroupBox.Header>
                 <Label Content="DropBox Operations" FontWeight="SemiBold"></Label>
             </GroupBox.Header>
 
-            <Grid>
+            <Grid Height="204" Margin="0,0,-0.2,-2.8" VerticalAlignment="Bottom">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="05"/>
@@ -52,12 +52,12 @@
                     <RowDefinition Height="150*"/>
                     <RowDefinition Height="05"/>
                 </Grid.RowDefinitions>
-                <Button x:Name="btnCreateFolder" Content="Create Folder" HorizontalAlignment="Stretch" Margin="5.2,5.2,3,5.2" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="1" FontSize="14" Click="btnCreateFolder_Click" Grid.ColumnSpan="2"/>
-                <Button x:Name="btlUpload" Content="Upload File" HorizontalAlignment="Stretch" Margin="7,5.2,1.8,5.2" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="3" FontSize="14" Click="btlUpload_Click" Grid.ColumnSpan="2"/>
-                <Button x:Name="btnDownload" Content="Download File" HorizontalAlignment="Stretch" Margin="7.2,5.2,3.4,5.2" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="5" FontSize="14" Click="btnDownload_Click"/>
-                <Button x:Name="btnDelete" Content="Delete File/Directory" HorizontalAlignment="Stretch" Margin="6.6,5.2,3,5.2" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="6" FontSize="14" Click="btnDelete_Click"/>
-                <ListBox HorizontalAlignment="Left" Height="110" Margin="5,-141,0,0" VerticalAlignment="Top" Width="981" Grid.Column="1" Grid.ColumnSpan="6" BorderThickness="2" SelectionChanged="ListBox_SelectionChanged"/>
-                <TextBox HorizontalAlignment="Left" Height="20" Margin="5,-166,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="981" Grid.Column="1" Grid.ColumnSpan="6" RenderTransformOrigin="0.499,0.27"/>
+                <Button x:Name="btnCreateFolder" Content="Create Folder" HorizontalAlignment="Stretch" Margin="5,147.2,6.36,0" VerticalAlignment="Stretch" Grid.Row="1" FontSize="14" Click="btnCreateFolder_Click" Grid.ColumnSpan="2" Grid.Column="1"/>
+                <Button x:Name="btlUpload" Content="Upload File" HorizontalAlignment="Stretch" Margin="4.64,147.2,1.797,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="3" FontSize="14" Click="btlUpload_Click" Grid.ColumnSpan="2"/>
+                <Button x:Name="btnDownload" Content="Download File" HorizontalAlignment="Stretch" Margin="7.203,147.2,3.397,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="5" FontSize="14" Click="btnDownload_Click"/>
+                <Button x:Name="btnDelete" Content="Delete File/Directory" HorizontalAlignment="Stretch" Margin="6.603,147.2,2.739,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="6" FontSize="14" Click="btnDelete_Click"/>
+                <ListBox HorizontalAlignment="Left" Margin="5,0,0,53" Width="984" Grid.ColumnSpan="6" BorderThickness="2" SelectionChanged="ListBox_SelectionChanged" Grid.Row="1" Grid.Column="1" Height="110" VerticalAlignment="Bottom"/>
+                <TextBox HorizontalAlignment="Left" Height="20" Margin="5,7.2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="983" Grid.Column="1" Grid.ColumnSpan="6" RenderTransformOrigin="0.499,0.27" Grid.Row="1"/>
 
             </Grid>
 
