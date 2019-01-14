@@ -114,7 +114,7 @@ namespace FileMIApp
                 {
                     if (strAccessToken != null && strAuthenticationURL != null)
                     {
-                        DBB.Upload("12345.jpg", @"D:\12345.JPG");
+                        DBB.Upload("/FileMItest2", "12345.jpg", @"D:\12345.JPG");
                     }
                 }
             }
