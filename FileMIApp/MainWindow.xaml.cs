@@ -33,7 +33,7 @@ namespace FileMIApp
         private string strAuthenticationURL = string.Empty;
         private DropBoxIntegration DBB;
         private HttpAuthorization Authorization = null;
-
+       
         private string CurrentPath = "";
         #endregion
 
@@ -93,9 +93,9 @@ namespace FileMIApp
                 {
                     if (strAccessToken != null && strAuthenticationURL != null)
                     {
-                        if (DBB.FolderExists("/FileMItest123") == false)
+                        if (DBB.FolderExists(MyTextBox.Text) == false)
                         {
-                            DBB.CreateFolder("/FileMItest123");
+                             DBB.CreateFolder(MyTextBox.Text);
                         }
                     }
                 }
@@ -114,7 +114,7 @@ namespace FileMIApp
                 {
                     if (strAccessToken != null && strAuthenticationURL != null)
                     {
-                        DBB.Upload("/FileMItest", "12345.jpg", @"D:\12345.JPG");
+                        DBB.Upload("12345.jpg", @"D:\12345.JPG");
                     }
                 }
             }
@@ -180,9 +180,14 @@ namespace FileMIApp
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+               
                 throw;
             }
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

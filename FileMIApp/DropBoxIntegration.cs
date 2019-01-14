@@ -14,7 +14,6 @@ namespace FileMIApp
 {
     class DropBoxIntegration
     {
-        //hello pepe
         private DropboxClient DBClient;
         private ListFolderArg DBFolders;
         private string oauth2State;
@@ -143,6 +142,7 @@ namespace FileMIApp
                 }
                 var foldersArg = new ListFolderArg(path);
                 var folder = DBClient.Files.ListFolderAsync(foldersArg);
+                
                 var result = folder.Result;
                 return true;
             }

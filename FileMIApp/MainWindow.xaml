@@ -57,7 +57,7 @@
                 <Button x:Name="btnDownload" Content="Download File" HorizontalAlignment="Stretch" Margin="7.203,147.2,3.397,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="5" FontSize="14" Click="btnDownload_Click"/>
                 <Button x:Name="btnDelete" Content="Delete File/Directory" HorizontalAlignment="Stretch" Margin="6.603,147.2,2.739,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="6" FontSize="14" Click="btnDelete_Click"/>
                 <ListBox HorizontalAlignment="Left" Margin="5,0,0,53" Width="984" Grid.ColumnSpan="6" BorderThickness="2" SelectionChanged="ListBox_SelectionChanged" Grid.Row="1" Grid.Column="1" Height="110" VerticalAlignment="Bottom"/>
-                <TextBox HorizontalAlignment="Left" Height="20" Margin="5,7.2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="983" Grid.Column="1" Grid.ColumnSpan="6" RenderTransformOrigin="0.499,0.27" Grid.Row="1"/>
+                <TextBox x:Name="MyTextBox" HorizontalAlignment="Left" Height="20" Margin="5,7.2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="983" Grid.Column="1" Grid.ColumnSpan="6" RenderTransformOrigin="0.499,0.27" Grid.Row="1" TextChanged="TextBox_TextChanged"/>
 
             </Grid>
 
