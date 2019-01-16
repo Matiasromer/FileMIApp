@@ -7,8 +7,13 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms.VisualStyles;
+using System.Windows.Threading;
 using Dropbox.Api;
 using Dropbox.Api.Files;
+using Microsoft.Win32;
+using Nemiro.OAuth;
+using Nemiro.OAuth.LoginForms;
 
 namespace FileMIApp
 {
@@ -18,6 +23,7 @@ namespace FileMIApp
         private ListFolderArg DBFolders;
         private string oauth2State;
         private const string RedirectUri = "https://filemi.eu.auth0.com/login/callback";
+        private string CurrentPath = "";
 
         //Contructor
         public DropBoxIntegration(string Apikey, string ApiSecret, string ApplicationName = "FileMI")
@@ -251,16 +257,63 @@ namespace FileMIApp
         {
             try
             {
-                var response = DBClient.Files.DownloadAsync(DropboxFolderPath + "/" + DropboxFileName);
-                var result = response.Result.GetContentAsStreamAsync();
-                return true;
+                
+
+                    var response = DBClient.Files.DownloadAsync(DropboxFolderPath + "/" + DropboxFileName);
+                        
+                    var result = response.Result.GetContentAsStreamAsync();
+                    return true;
+                
             }
             catch (Exception ex)
             {
                 return false;
             }
         }
+        /*
+        public void Dowload()
+        {
+            OAuthUtility.PutAsync
+                (
+                "https://content.dropboxapi.com/2/files/download",
+                new HttpParameterCollection
+                {
+                    {"access_token", AccessTocken },
+                    {"path", Path.Combine(this.CurrentPath, Path.GetFileName(OpenFileDialog.F)) }
+                });
+        }
+        */
+        public void Getfiles()
+        {
+            OAuthUtility.GetAsync
+                (
+                "https://api.dropboxapi.com/2/files/get_metadata",
+                new HttpParameterCollection
+                {
+                    {"path", this.CurrentPath },
+                    {"access_token", AccessTocken }
+                },
+                callback: GetFiles_Result
+                );
+        }
+        public void GetFiles_Result(RequestResult result)
+        {
+            if (!Dispatcher.CurrentDispatcher.CheckAccess())
+            {
+                Dispatcher.CurrentDispatcher.Invoke(new Action<RequestResult>(GetFiles_Result), result);
+                return;
+            }
 
+            if (result.StatusCode == 200)
+            {
+                
+            }
+            else
+            {
+                MessageBox.Show("Deth");
+            }
+            
+        }
         private bool CanAuthenticate()
         {
             try
