@@ -162,34 +162,85 @@ namespace FileMIApp
         private void btlUpload_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileD = new OpenFileDialog();
-
-            var fs = new FileStream(fileD.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-            OAuthUtility.PostAsync
-                ("https://content.dropboxapi.com/2/files/upload",
-                new HttpParameterCollection
-                {
-                    {fs }
-                },
-                headers: new NameValueCollection { { "Dropbox-API-Arg", } }
-                );
-            /*
-            try
+            Nullable<bool> result = fileD.ShowDialog();
+            if (result.HasValue && result.Value)
             {
-                if (DBB != null)
-                {
-                    if (strAccessToken != null && strAuthenticationURL != null)
+
+                var fs = new FileStream(fileD.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                var fileInfo = UniValue.Empty;
+                fileInfo["path"] = (String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + System.IO.Path
+                                       .Combine(this.CurrentPath, System.IO.Path.GetFileName(fileD.FileName))
+                                       .Replace("\\", "/");
+                fileInfo["mode"] = "add";
+                fileInfo["autorename"] = true;
+                fileInfo["mute"] = false;
+
+                OAuthUtility.PostAsync
+                ("https://content.dropboxapi.com/2/files/upload",
+                    new HttpParameterCollection
                     {
-                        DBB.Upload("/FileMItest2", "12345.jpg", @"D:\12345.JPG");
+                        {fs}
+                    },
+                    headers: new NameValueCollection {{"Dropbox-API-Arg", fileInfo.ToString()}},
+                    contentType: "application/octet-stream",
+                    authorization: this.Authorization,
+                    callback: this.Upload_Result,
+                    streamWriteCallback: this.Upload_Processing
+                );
+                /*
+                try
+                {
+                    if (DBB != null)
+                    {
+                        if (strAccessToken != null && strAuthenticationURL != null)
+                        {
+                            DBB.Upload("/FileMItest2", "12345.jpg", @"D:\12345.JPG");
+                        }
                     }
                 }
+                catch (Exception)
+                {
+    
+                    throw;
+                }
+                */
             }
-            catch (Exception)
-            {
 
-                throw;
+        }
+
+        private void Upload_Processing(object sender, StreamWriteEventArgs e)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action<object, StreamWriteEventArgs>(this.Upload_Processing), sender, e);
+                return;
             }
-            */
+        }
+
+        private void Upload_Result(RequestResult result)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action<RequestResult>(this.Upload_Result), result);
+                return;
+            }
+
+            if (result.StatusCode == 200)
+            {
+                this.Getfiles();
+            }
+            else
+            {
+                if (result["error"].HasValue)
+                {
+                    MessageBox.Show(result["error"].ToString());
+                }
+                else
+                {
+                    MessageBox.Show(result.ToString());
+                }
+            }
         }
 
         private void btnDownload_Click(object sender, RoutedEventArgs e)
