@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ using Dropbox.Api.Auth;
 using Nemiro.OAuth;
 using Nemiro.OAuth.LoginForms;
 using System.IO;
+using Dropbox.Api.Files;
+using Microsoft.Win32;
 
 
 
@@ -36,12 +39,18 @@ namespace FileMIApp
         private HttpAuthorization Authorization = null;
        
         private string CurrentPath = "";
+
+        private Stream DownloadReader = null;
+        private FileStream DownloadFileStream = null;
+        private BinaryWriter DownloadWriter = null;
+        private byte[] DownloadReadBuffer = new byte[4096];
         #endregion
 
         #region Constructor    
         public MainWindow()
         {
             InitializeComponent();
+            
         }
         #endregion
 
@@ -152,6 +161,19 @@ namespace FileMIApp
 
         private void btlUpload_Click(object sender, RoutedEventArgs e)
         {
+            OpenFileDialog fileD = new OpenFileDialog();
+
+            var fs = new FileStream(fileD.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+            OAuthUtility.PostAsync
+                ("https://content.dropboxapi.com/2/files/upload",
+                new HttpParameterCollection
+                {
+                    {fs }
+                },
+                headers: new NameValueCollection { { "Dropbox-API-Arg", } }
+                );
+            /*
             try
             {
                 if (DBB != null)
@@ -167,6 +189,7 @@ namespace FileMIApp
 
                 throw;
             }
+            */
         }
 
         private void btnDownload_Click(object sender, RoutedEventArgs e)
@@ -219,15 +242,22 @@ namespace FileMIApp
 
         public void Getfiles()
         {
-            OAuthUtility.GetAsync
+            OAuthUtility.PostAsync
             (
-                "https://api.dropboxapi.com/2/files/get_metadata",
+                "https://api.dropboxapi.com/2/files/list_folder",
                 new HttpParameterCollection
                 {
-                    {"path", this.CurrentPath },
-                    {"access_token", DBB.AccessTocken }
+                    new
+                    {
+                        path = this.CurrentPath,
+                        include_media_info = true
+                    }
+                    //{"path", this.CurrentPath },
+                    //{"access_token", DBB.AccessTocken }
                 },
-                callback: GetFiles_Result
+                contentType: "application/json",
+                authorization: this.Authorization,
+                callback: this.GetFiles_Result
             );
         }
         public void GetFiles_Result(RequestResult result)
@@ -247,14 +277,15 @@ namespace FileMIApp
                 {
                     MyListBox.Items.Add(file);
                 }
-            }
-            if (!String.IsNullOrEmpty(this.CurrentPath))
-            {
-                this.MyListBox.Items.Insert(0, UniValue.ParseJson("{path_display: '..'}"));
+
+                if (!String.IsNullOrEmpty(this.CurrentPath))
+                {
+                    this.MyListBox.Items.Insert(0, UniValue.ParseJson("{path_display: '..'}"));
+                }
             }
             else
             {
-                MessageBox.Show("Deth");
+                MessageBox.Show(result.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
         }

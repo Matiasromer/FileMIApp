@@ -283,37 +283,8 @@ namespace FileMIApp
                 });
         }
         */
-        public void Getfiles()
-        {
-            OAuthUtility.GetAsync
-                (
-                "https://api.dropboxapi.com/2/files/get_metadata",
-                new HttpParameterCollection
-                {
-                    {"path", this.CurrentPath },
-                    {"access_token", AccessTocken }
-                },
-                callback: GetFiles_Result
-                );
-        }
-        public void GetFiles_Result(RequestResult result)
-        {
-            if (!Dispatcher.CurrentDispatcher.CheckAccess())
-            {
-                Dispatcher.CurrentDispatcher.Invoke(new Action<RequestResult>(GetFiles_Result), result);
-                return;
-            }
-
-            if (result.StatusCode == 200)
-            {
-                
-            }
-            else
-            {
-                MessageBox.Show("Deth");
-            }
-            
-        }
+        
+        
         private bool CanAuthenticate()
         {
             try
