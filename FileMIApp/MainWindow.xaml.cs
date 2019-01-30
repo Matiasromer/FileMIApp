@@ -18,6 +18,7 @@ using Dropbox.Api.Auth;
 using Nemiro.OAuth;
 using Nemiro.OAuth.LoginForms;
 using System.IO;
+using System.Net;
 using Dropbox.Api.Files;
 using Microsoft.Win32;
 
@@ -37,6 +38,7 @@ namespace FileMIApp
         private string strAuthenticationURL = string.Empty;
         private DropBoxIntegration DBB;
         private HttpAuthorization Authorization = null;
+        private NewOAuthUtility NewOAuthUtility;
        
         private string CurrentPath = "";
 
@@ -161,10 +163,13 @@ namespace FileMIApp
 
         private void btlUpload_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog fileD = new OpenFileDialog();
+            OpenFileDialog fileD = new OpenFileDialog();        
             Nullable<bool> result = fileD.ShowDialog();
-            if (result.HasValue && result.Value)
+            if (result.HasValue && result.Value == false)
             {
+                return;
+            }
+            
 
                 var fs = new FileStream(fileD.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
@@ -205,7 +210,7 @@ namespace FileMIApp
                     throw;
                 }
                 */
-            }
+            
 
         }
 
@@ -245,46 +250,57 @@ namespace FileMIApp
 
         private void btnDownload_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (DBB != null)
-                {
-                    if (strAccessToken != null && strAuthenticationURL != null)
-                    {
-                        DBB.Download("/FileMItest2", "12345.jpg", @"D:\Billedtest", "12345.jpg");
-                    }
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
+            
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (DBB != null)
+            NewOAuthUtility.DeleteAsync
+            (
+                "https://api.dropboxapi.com/2/files/delete_v2",
+                new HttpParameterCollection
                 {
-                    if (strAccessToken != null && strAuthenticationURL != null)
+                    new
                     {
-                        DBB.Delete("/Dropbox/DotNetApi");
+                        path = ((String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + System.IO.Path
+                                    .Combine(this.CurrentPath, this.MyTextBox.Text).Replace("\\", "/"))
                     }
-                }
-            }
-            catch (Exception)
+                },
+                contentType: "application/json",
+                authorization: this.Authorization,
+                callback: this.DeleteFile_Result
+            );
+
+        }
+
+        private void DeleteFile_Result(RequestResult result)
+        {
+            if (!Dispatcher.CheckAccess())
             {
-                throw;
+                Dispatcher.Invoke(new Action<RequestResult>(this.DeleteFile_Result), result);
+                return;
+            }
+
+            if (result.StatusCode == 200)
+            {
+                this.Getfiles();
+            }
+            else
+            {
+                if (result["error"].HasValue)
+                {
+                    MessageBox.Show(result["error"].ToString());
+                }
+                else
+                {
+                    MessageBox.Show(result.ToString());
+                }
             }
         }
 
-        
 
-        
 
-        
+
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -343,6 +359,7 @@ namespace FileMIApp
 
         private void MyListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            /*
             try
             {
                 if (DBB != null)
@@ -357,6 +374,78 @@ namespace FileMIApp
             {
                 throw;
             }
+            */
         }
+        
+        private void MyListBox_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            
+            if (MyListBox.SelectedItem == null)
+            {
+                return;
+            }
+            var file = (UniValue)this.MyListBox.SelectedItem;
+
+            if (file["path_display"] == "..")
+            {
+                if (!String.IsNullOrEmpty(this.CurrentPath))
+                {
+                    this.CurrentPath = System.IO.Path.GetDirectoryName(this.CurrentPath).Replace("\\", "/");
+                    if (this.CurrentPath == "/")
+                    {
+                        this.CurrentPath = "";
+                    }
+                }
+            }
+            else
+            {
+                if (file[".tag"].Equals("folder"))
+                {
+                    this.CurrentPath = file["path_display"].ToString();
+                }
+                else
+                {
+                    SaveFileDialog SaveF = new SaveFileDialog();
+                    
+                    SaveF.FileName = System.IO.Path.GetFileName(file["path_display"].ToString());
+
+                    Nullable<bool> result = SaveF.ShowDialog();
+                    if (result.HasValue && result.Value == false)
+                    {
+                        return;
+                    }
+                    
+
+                    this.DownloadFileStream = new FileStream(SaveF.FileName, FileMode.Create, FileAccess.Write);
+                    this.DownloadWriter = new BinaryWriter(this.DownloadFileStream);
+
+                    var req = WebRequest.Create("https://content.dropboxapi.com/2/files/download");
+
+                    req.Method = "POST";
+
+                    req.Headers.Add(HttpRequestHeader.Authorization, this.Authorization.ToString());
+                    req.Headers.Add("Dropboc-API-Arg", UniValue.Create(new { path = file["path_display"].ToString() }).ToString());
+                    /*
+                    req.BeginGetResponse(resultB =>
+                    {
+                        var resp = req.EndGetResponse(resultB);
+
+                        this.DownloadReader = resp.GetResponseStream();
+
+                        this.DownloadReader.BeginRead(this.DownloadReadBuffer, 0, this.DownloadReadBuffer.Length,
+                            this.DownloadReadCallback, null);
+                    }, null);
+                    */
+
+                }
+            }
+            this.Getfiles();
+        }
+        /*
+        private void DownloadReadCallback(IAsyncResult resultB)
+        {
+            var bytesRead = this.DownloadReader.EndRead(resultB);
+        }
+        */
     }
 }

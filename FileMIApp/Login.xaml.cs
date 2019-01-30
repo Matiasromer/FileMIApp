@@ -51,13 +51,13 @@ namespace FileMIApp
 
         }
         */
-        public Login(string AppKey, string AuthenticationUrl, string oauth2State)
-        {
-            InitializeComponent();
-            DBAppKey = AppKey;
-            DbAuthenticationURL = AuthenticationUrl;
-            DBoauth2State = oauth2State;
-        }
+ public Login(string AppKey, string AuthenticationUrl, string oauth2State)
+ {
+    InitializeComponent();
+    DBAppKey = AppKey;
+    DbAuthenticationURL = AuthenticationUrl;
+    DBoauth2State = oauth2State;
+ }
 
         public void Navigate()
         {

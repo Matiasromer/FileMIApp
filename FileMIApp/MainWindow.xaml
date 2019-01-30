@@ -25,7 +25,7 @@
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="App Key: " Grid.Column="0" HorizontalContentAlignment="Right" Margin="2"/>
-                <TextBox x:Name="txtApiKey" Grid.Column="1" Margin="2" MaxLength="100" Text=""></TextBox>
+                <TextBox x:Name="txtApiKey" Grid.Column="1" Margin="2" MaxLength="100" Text="m45bsokx6gse20d"></TextBox>
                 <Button Content="Authenticate" x:Name="btnApiKey" Grid.Column="2" Margin="2" Click="btnApiKey_Click"></Button>
             </Grid>
 
@@ -41,9 +41,9 @@
                     <ColumnDefinition Width="05"/>
                     <ColumnDefinition Width="53*"/>
                     <ColumnDefinition Width="202*"/>
-                    <ColumnDefinition Width="26*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="222*"/>
-                    <ColumnDefinition Width="246*"/>
+                    <ColumnDefinition Width="245*"/>
                     <ColumnDefinition Width="242*"/>
                     <ColumnDefinition Width="05"/>
                 </Grid.ColumnDefinitions>
@@ -56,7 +56,7 @@
                 <Button x:Name="btlUpload" Content="Upload File" HorizontalAlignment="Stretch" Margin="4.64,147.2,1.797,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="3" FontSize="14" Click="btlUpload_Click" Grid.ColumnSpan="2"/>
                 <Button x:Name="btnDownload" Content="Download File" HorizontalAlignment="Stretch" Margin="7.203,147.2,3.397,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="5" FontSize="14" Click="btnDownload_Click"/>
                 <Button x:Name="btnDelete" Content="Delete File/Directory" HorizontalAlignment="Stretch" Margin="6.603,147.2,2.739,0" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="6" FontSize="14" Click="btnDelete_Click"/>
-                <ListBox x:Name="MyListBox"  HorizontalAlignment="Left" Margin="5,0,0,53" Width="984" Grid.ColumnSpan="6" BorderThickness="2" Grid.Row="1" Grid.Column="1" Height="110" VerticalAlignment="Bottom" SelectionChanged="MyListBox_SelectionChanged"/>
+                <ListBox x:Name="MyListBox"  HorizontalAlignment="Left" Margin="5,0,0,53" Width="984" Grid.ColumnSpan="6" BorderThickness="2" Grid.Row="1" Grid.Column="1" Height="110" VerticalAlignment="Bottom" SelectionChanged="MyListBox_SelectionChanged" MouseDoubleClick="MyListBox_OnMouseDoubleClick"/>
                 <TextBox x:Name="MyTextBox" HorizontalAlignment="Left" Height="20" Margin="5,7.2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="983" Grid.Column="1" Grid.ColumnSpan="6" RenderTransformOrigin="0.499,0.27" Grid.Row="1" TextChanged="TextBox_TextChanged"/>
 
             </Grid>

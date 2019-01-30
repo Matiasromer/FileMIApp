@@ -92,47 +92,45 @@ namespace FileMIApp
             }
         }
         //123
-        public string GenerateAccessToken()
+ public string GenerateAccessToken()
+ {
+    try
+    {
+        string _strAccessToken = string.Empty;
+        if (CanAuthenticate())
         {
-            try
-            {
-                string _strAccessToken = string.Empty;
-
-                if (CanAuthenticate())
+            if (string.IsNullOrEmpty(AuthenticationUrl))
                 {
-                    if (string.IsNullOrEmpty(AuthenticationUrl))
-                    {
-                        throw new Exception("AuthenticationURL is not generated !");
-                    }
-                    Login login = new Login(AppKey, AuthenticationUrl, this.oauth2State);
-                    login.Owner = Application.Current.MainWindow;
-                    login.ShowDialog();
-                    if (login.Result)
-                    {
-                        _strAccessToken = login.AccessToken;
-                        AccessTocken = login.AccessToken;
-                        Uid = login.Uid;
-                        DropboxClientConfig CC = new DropboxClientConfig(AppName, 1);
-                        HttpClient HTC = new HttpClient();
-                        HTC.Timeout = TimeSpan.FromMinutes(10);
-                        CC.HttpClient = HTC;
-                        DBClient = new DropboxClient(AccessTocken, CC);
-                    }
-                    else
-                    {
-                        DBClient = null;
-                        AccessTocken = string.Empty;
-                        Uid = string.Empty;
-                    }
+                    throw new Exception("AuthenticationURL is not generated !");
                 }
-                return _strAccessToken;
-            }
-            catch (Exception ex)
-            {
-                
-                throw ex;
-            }
+                Login login = new Login(AppKey, AuthenticationUrl, this.oauth2State);
+                login.Owner = Application.Current.MainWindow;
+                login.ShowDialog();
+                if (login.Result)
+                {
+                    _strAccessToken = login.AccessToken;
+                    AccessTocken = login.AccessToken;
+                    Uid = login.Uid;
+                    DropboxClientConfig CC = new DropboxClientConfig(AppName, 1);
+                    HttpClient HTC = new HttpClient();
+                    HTC.Timeout = TimeSpan.FromMinutes(10);
+                    CC.HttpClient = HTC;
+                    DBClient = new DropboxClient(AccessTocken, CC);
+                }
+                else
+                {
+                    DBClient = null;
+                    AccessTocken = string.Empty;
+                    Uid = string.Empty;
+                }
         }
+        return _strAccessToken;
+    }
+    catch (Exception ex)
+    {               
+        throw ex;
+    }
+ }
         // egen metode over henter en lister af filer
         public bool ListFolder(string path)
         {
