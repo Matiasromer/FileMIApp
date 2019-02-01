@@ -39,7 +39,7 @@ namespace FileMIApp
         private DropBoxIntegration DBB;
         private HttpAuthorization Authorization = null;
         private NewOAuthUtility NewOAuthUtility;
-       
+
         private string CurrentPath = "";
 
         private Stream DownloadReader = null;
@@ -251,7 +251,6 @@ namespace FileMIApp
 
         private void btnDownload_Click(object sender, RoutedEventArgs e)
         {
-            
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
@@ -422,7 +421,8 @@ namespace FileMIApp
 
                     var req = WebRequest.Create("https://content.dropboxapi.com/2/files/download");
 
-                    req.Method = "POST";
+                    //req.Method = "POST";
+                    req.Method = "GET";
 
                     req.Headers.Add(HttpRequestHeader.Authorization, this.Authorization.ToString());
                     req.Headers.Add("Dropboc-API-Arg", UniValue.Create(new { path = file["path_display"].ToString() }).ToString());
@@ -442,11 +442,10 @@ namespace FileMIApp
             }
             this.Getfiles();
         }
-        /*
-        private void DownloadReadCallback(IAsyncResult resultB)
+
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
         {
-            var bytesRead = this.DownloadReader.EndRead(resultB);
+
         }
-        */
     }
 }
