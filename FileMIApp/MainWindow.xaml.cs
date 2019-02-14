@@ -107,32 +107,14 @@ namespace FileMIApp
                 {
                     new 
                     {
-                        path = ((String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + System.IO.Path.Combine(this.CurrentPath, this.MyTextBox.Text).Replace("\\", "/"))
+                        path = ((String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + 
+                        System.IO.Path.Combine(this.CurrentPath, this.MyTextBox.Text).Replace("\\", "/"))
                     }
                 },
                 contentType: "application/json",
                 authorization: this.Authorization,
                 callback: this.CreateFolder_Result
                 );
-            /*
-            try
-            {
-                if (DBB != null)
-                {
-                    if (strAccessToken != null && strAuthenticationURL != null)
-                    {
-                        if (DBB.FolderExists(MyTextBox.Text) == false)
-                        {
-                             DBB.CreateFolder(MyTextBox.Text);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex = ex.InnerException ?? ex;
-            }
-            */
 
         }
 
@@ -193,23 +175,6 @@ namespace FileMIApp
                     callback: this.Upload_Result,
                     streamWriteCallback: this.Upload_Processing
                 );
-                /*
-                try
-                {
-                    if (DBB != null)
-                    {
-                        if (strAccessToken != null && strAuthenticationURL != null)
-                        {
-                            DBB.Upload("/FileMItest2", "12345.jpg", @"D:\12345.JPG");
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-    
-                    throw;
-                }
-                */
             
 
         }
@@ -303,14 +268,7 @@ namespace FileMIApp
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            /*MyListBox.Items.Clear();
-            for (int i = 0; i < items.Count; i++)
-            {
-                if (items[i].ToString().ToLower().Contains(MyTextBox.Text))
-                {
-                    MyListBox.Items.Add(items[i]);
-                }
-            }*/
+
         }
 
         public void Getfiles()
@@ -363,19 +321,14 @@ namespace FileMIApp
 
         }
 
-        //List<String> items = new List<string>();
         private void MyListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            /*Just added this, delete if causing problems
-            for (int i = 0; i < MyListBox.Items.Count; i++)
-            {
-                items.Add(MyListBox.Items[i].ToString());
-            }*/
+
         }
         
         private void MyListBox_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            
+
             if (MyListBox.SelectedItem == null)
             {
                 return;
@@ -402,7 +355,7 @@ namespace FileMIApp
                 else
                 {
                     SaveFileDialog SaveF = new SaveFileDialog();
-                    
+
                     SaveF.FileName = System.IO.Path.GetFileName(file["path_display"].ToString());
 
                     Nullable<bool> result = SaveF.ShowDialog();
@@ -410,19 +363,18 @@ namespace FileMIApp
                     {
                         return;
                     }
-                    
+
 
                     this.DownloadFileStream = new FileStream(SaveF.FileName, FileMode.Create, FileAccess.Write);
                     this.DownloadWriter = new BinaryWriter(this.DownloadFileStream);
 
                     var req = WebRequest.Create("https://content.dropboxapi.com/2/files/download");
 
-                    //req.Method = "POST";
                     req.Method = "GET";
 
                     req.Headers.Add(HttpRequestHeader.Authorization, this.Authorization.ToString());
-                    req.Headers.Add("Dropboc-API-Arg", UniValue.Create(new { path = file["path_display"].ToString() }).ToString());
-                    /*
+                    req.Headers.Add("Dropbox-API-Arg", UniValue.Create(new { path = file["path_display"].ToString() }).ToString());
+
                     req.BeginGetResponse(resultB =>
                     {
                         var resp = req.EndGetResponse(resultB);
@@ -432,65 +384,73 @@ namespace FileMIApp
                         this.DownloadReader.BeginRead(this.DownloadReadBuffer, 0, this.DownloadReadBuffer.Length,
                             this.DownloadReadCallback, null);
                     }, null);
-                    */
+
 
                 }
             }
             this.Getfiles();
         }
 
-        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        private void DownloadReadCallback(IAsyncResult resultB)
         {
-            this.Searchfiles();
+            var bytesRead = this.DownloadReader.EndRead(resultB);
+
+            if (bytesRead > 0)
+            {
+                if (this.DownloadFileStream.CanWrite)
+                {
+                    this.DownloadWriter.Write(this.DownloadReadBuffer.Take(bytesRead).ToArray());
+                    this.DownloadReader.BeginRead(this.DownloadReadBuffer, 0, this.DownloadReadBuffer.Length,
+                        DownloadReadCallback, null);
+                }
+            }
+            else
+            {
+                this.DownloadFileStream.Close();
+            }
         }
 
-        public void Searchfiles()
+
+
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
         {
             OAuthUtility.PostAsync
             (
-                "https://api.dropboxapi.com/2/files/list_folder",
+                "https://api.dropboxapi.com/2/files/search",
                 new HttpParameterCollection
                 {
                     new
-                    {
-                        path = this.CurrentPath,
-                        include_media_info = true
+                    {                   
+                        //string som man skal søge.
+                        query = MyTextBox.Text, 
+                        // den path i brugerens dropbox man skal søge i.
+                        path = this.CurrentPath
                     }
-                    //{"path", this.CurrentPath },
-                    //{"access_token", DBB.AccessTocken }
                 },
                 contentType: "application/json",
                 authorization: this.Authorization,
-                callback: this.SearchFiles_Result
+                callback: this.GetFilesSearch_Result
             );
+
         }
 
-        List<String> items = new List<string>();
-        public void SearchFiles_Result(RequestResult result)
+        private void GetFilesSearch_Result(RequestResult result)
         {
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.Invoke(new Action<RequestResult>(SearchFiles_Result), result);
+                Dispatcher.Invoke(new Action<RequestResult>(GetFilesSearch_Result), result);
                 return;
             }
 
             if (result.StatusCode == 200)
             {
                 this.MyListBox.Items.Clear();
-                this.MyListBox.DisplayMemberPath = "path_display";
+                this.MyListBox.DisplayMemberPath = "metadata";
 
-                for (int i = 0; i < items.Count; i++)
-                {
-                    if (items[i].ToString().ToLower().Contains(MyTextBox.Text))
-                    {
-                        MyListBox.Items.Add(items[i]);
-                    }
-                }
-
-                /*foreach (UniValue file in result["entries"])
+                foreach (UniValue file in result["matches"])
                 {
                     MyListBox.Items.Add(file);
-                }*/
+                }
 
                 if (!String.IsNullOrEmpty(this.CurrentPath))
                 {
@@ -502,44 +462,7 @@ namespace FileMIApp
                 MessageBox.Show(result.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        //private void MyListBox_DragNDrop(object sender, DragEventHandler drag)
-        /*private void MyListBox_DragNDrop(object sender, DragEventArgs e)
-        {
-            e.Effects = DragDropEffects.All;
-            //this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Drop);
-            DragEventHandler d = new DragEventHandler(MyListBox_DragNDrop);
-            OpenFileDialog fileD = new OpenFileDialog();
-            Nullable<bool> result = fileD.ShowDialog();
-            if (result.HasValue && result.Value == false)
-            {
-                return;
-            }
-
-
-            var fs = new FileStream(fileD.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-            var fileInfo = UniValue.Empty;
-            fileInfo["path"] = (String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + System.IO.Path
-                                   .Combine(this.CurrentPath, System.IO.Path.GetFileName(fileD.FileName))
-                                   .Replace("\\", "/");
-            fileInfo["mode"] = "add";
-            fileInfo["autorename"] = true;
-            fileInfo["mute"] = false;
-
-            OAuthUtility.PostAsync
-            ("https://content.dropboxapi.com/2/files/upload",
-                new HttpParameterCollection
-                {
-                        {fs}
-                },
-                headers: new NameValueCollection { { "Dropbox-API-Arg", fileInfo.ToString() } },
-                contentType: "application/octet-stream",
-                authorization: this.Authorization,
-                callback: this.Upload_Result,
-                streamWriteCallback: this.Upload_Processing
-            );
-        }*/
-
+        
         private void MyListBox_Drop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);

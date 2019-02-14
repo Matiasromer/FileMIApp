@@ -24,9 +24,9 @@
                     <ColumnDefinition Width="100*"/>
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="App Key: " Grid.Column="0" HorizontalContentAlignment="Right" Margin="2"/>
-                <TextBox x:Name="txtApiKey" Grid.Column="1" Margin="2" MaxLength="100" Text="m45bsokx6gse20d"></TextBox>
-                <Button Content="Authenticate" x:Name="btnApiKey" Grid.Column="2" Margin="2" Click="btnApiKey_Click"></Button>
+                <Label Content="App Key: " Grid.Column="0" HorizontalContentAlignment="Right" Margin="2" Visibility="Hidden"/>
+                <TextBox x:Name="txtApiKey" Grid.Column="1" Margin="2" MaxLength="100" Text="m45bsokx6gse20d" Visibility="Hidden"></TextBox>
+                <Button Content="Authenticate" x:Name="btnApiKey" Grid.Column="1" Margin="311,4,315.8,0.4" Click="btnApiKey_Click"></Button>
             </Grid>
 
         </GroupBox>
