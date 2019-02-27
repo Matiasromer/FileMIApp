@@ -215,6 +215,53 @@ namespace FileMIApp
 
         private void btnDownload_Click(object sender, RoutedEventArgs e)
         {
+            if (MyListBox.SelectedItem == null)
+            {
+                return;
+            }
+
+            var file = (UniValue)this.MyListBox.SelectedItem;
+
+            if (file[".tag"].Equals("folder"))
+            {
+                // this.CurrentPath = file["path_display"].ToString();
+                MessageBox.Show("Cannot download folder, please select a file");
+                return;
+            }
+
+            SaveFileDialog SaveF = new SaveFileDialog();
+
+            SaveF.FileName = System.IO.Path.GetFileName(file["path_display"].ToString());
+
+            Nullable<bool> result = SaveF.ShowDialog();
+            if (result.HasValue && result.Value == false)
+            {
+                return;
+            }
+
+
+            this.DownloadFileStream = new FileStream(SaveF.FileName, FileMode.Create, FileAccess.Write);
+            this.DownloadWriter = new BinaryWriter(this.DownloadFileStream);
+
+            var req = WebRequest.Create("https://content.dropboxapi.com/2/files/download");
+
+            req.Method = "GET";
+
+            req.Headers.Add(HttpRequestHeader.Authorization, this.Authorization.ToString());
+            req.Headers.Add("Dropbox-API-Arg", UniValue.Create(new { path = file["path_display"].ToString() }).ToString());
+
+            req.BeginGetResponse(resultB =>
+            {
+                var resp = req.EndGetResponse(resultB);
+
+                this.DownloadReader = resp.GetResponseStream();
+
+                this.DownloadReader.BeginRead(this.DownloadReadBuffer, 0, this.DownloadReadBuffer.Length,
+                    this.DownloadReadCallback, null);
+            }, null);
+
+            this.Getfiles();
+
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
@@ -323,6 +370,23 @@ namespace FileMIApp
 
         private void MyListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //MyTextBox.Text = MyListBox.SelectedItem.ToString().Split('/')[0];
+            //this.MyListBox.DisplayMemberPath = "name".ToString();
+            //MyTextBox.Text = MyListBox.SelectedItem.ToString();
+
+            //MyTextBox.Text = MyListBox.DisplayMemberPath = "path_display";
+
+            /*var memberpath = MyListBox.DisplayMemberPath = "path_display";
+
+            foreach (var file in memberpath)
+            {
+                MyTextBox.Text = MyListBox.SelectedItem.ToString();
+            }*/
+
+            //this.MyTextBox.Text = MyListBox.DisplayMemberPath.ToString();
+
+            //var selectedThing = MyListBox.SelectedItem.ToString();
+            //MyTextBox.Text = selectedThing.Substring(0, selectedThing.IndexOf("@") + 1);
 
         }
         
@@ -496,6 +560,56 @@ namespace FileMIApp
         private void MyListBox_DragEnter(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.All;
+        }
+
+        private void BtnUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileD = new OpenFileDialog();
+            Nullable<bool> result = fileD.ShowDialog();
+            if (result.HasValue && result.Value == false)
+            {
+                return;
+            }
+
+
+            var fs = new FileStream(fileD.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+            var fileInfo = UniValue.Empty;
+            fileInfo["path"] = (String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + System.IO.Path
+                                   .Combine(this.CurrentPath, System.IO.Path.GetFileName(fileD.FileName))
+                                   .Replace("\\", "/");
+            fileInfo["mode"] = "add";
+            fileInfo["autorename"] = true;
+            fileInfo["mute"] = false;
+
+            OAuthUtility.PostAsync
+            ("https://content.dropboxapi.com/2/files/upload",
+                new HttpParameterCollection
+                {
+                        {fs}
+                },
+                headers: new NameValueCollection { { "Dropbox-API-Arg", fileInfo.ToString() } },
+                contentType: "application/octet-stream",
+                authorization: this.Authorization,
+                callback: this.Upload_Result,
+                streamWriteCallback: this.Upload_Processing
+            );
+
+            NewOAuthUtility.DeleteAsync
+            (
+                "https://api.dropboxapi.com/2/files/delete_v2",
+                new HttpParameterCollection
+                {
+                    new
+                    {
+                        path = ((String.IsNullOrEmpty(this.CurrentPath) ? "/" : "") + System.IO.Path
+                                    .Combine(this.CurrentPath, this.MyTextBox.Text).Replace("\\", "/"))
+                    }
+                },
+                contentType: "application/json",
+                authorization: this.Authorization,
+                callback: this.DeleteFile_Result
+            );
         }
     }
 }
